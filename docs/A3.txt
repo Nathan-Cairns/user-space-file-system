@@ -97,5 +97,10 @@ Then shut the user space file system down executing the command: fusermount -u m
 output:
 
 
+QUESTIONS
+==============
 
+Q. Discuss the pros and cons of deleting all versions if a file is deleted in the mount directory.
+
+A.
 
