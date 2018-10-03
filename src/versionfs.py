@@ -170,6 +170,7 @@ class VersionFS(LoggingMixIn, Operations):
         if self.current_file is not None and not filecmp.cmp(full_path, self.current_file):
             print '** Files were not equal **'
 
+        # TODO delete tmp file!!!!!!!!!!!!!!!!!!!!
         self.current_file = None;
         return os.close(fh)
 
