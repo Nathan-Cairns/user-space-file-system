@@ -6,6 +6,8 @@ import logging
 import os
 import sys
 import errno
+import filecmp
+from shutil import copyfile
 
 from fuse import FUSE, FuseOSError, Operations, LoggingMixIn
 
@@ -20,6 +22,7 @@ class VersionFS(LoggingMixIn, Operations):
         else:
             print 'Creating version directory.'
             os.mkdir(self.root)
+        self.current_file = None;
 
     # Helpers
     # =======
@@ -29,6 +32,12 @@ class VersionFS(LoggingMixIn, Operations):
             partial = partial[1:]
         path = os.path.join(self.root, partial)
         return path
+
+    def _create_tmp_file(self, full_path):
+        # Create tmp file for checking changes
+        self.current_file = "%s%s" % (full_path, ".tmp")
+        print '** Creating tmp file', self.current_file, '**'
+        copyfile(full_path, self.current_file)
 
     # Filesystem methods
     # ==================
@@ -122,6 +131,10 @@ class VersionFS(LoggingMixIn, Operations):
     def open(self, path, flags):
         print '** open:', path, '**'
         full_path = self._full_path(path)
+
+        # Create tmp file to check changes
+        self._create_tmp_file(full_path)
+
         return os.open(full_path, flags)
 
     def create(self, path, mode, fi=None):
@@ -151,6 +164,13 @@ class VersionFS(LoggingMixIn, Operations):
 
     def release(self, path, fh):
         print '** release', path, '**'
+
+        # Compare current file with file being released if they are different do versioning
+        full_path = self._full_path(path)
+        if self.current_file is not None and not filecmp.cmp(full_path, self.current_file):
+            print '** Files were not equal **'
+
+        self.current_file = None;
         return os.close(fh)
 
     def fsync(self, path, fdatasync, fh):
