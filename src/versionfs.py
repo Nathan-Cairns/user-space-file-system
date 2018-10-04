@@ -8,6 +8,7 @@ import sys
 import errno
 import filecmp
 from shutil import copyfile
+from glob import glob
 
 from fuse import FUSE, FuseOSError, Operations, LoggingMixIn
 
@@ -38,6 +39,19 @@ class VersionFS(LoggingMixIn, Operations):
         self.current_file = "%s%s" % (full_path, ".tmp")
         print '** Creating tmp file', self.current_file, '**'
         copyfile(full_path, self.current_file)
+
+    def _create_new_version(self, tmp_full_path):
+        # Get relevant path data
+        basename = os.path.basename(tmp_full_path)
+        print '** Creating new version for', basename, '**'
+        split = basename.split('.')
+        split = split[:len(split) - 1]
+        print split
+        search_string = "%s*%s" % split[0], split
+        print search_string
+        files = glob(search_string)
+        print files
+
 
     # Filesystem methods
     # ==================
@@ -169,9 +183,14 @@ class VersionFS(LoggingMixIn, Operations):
         full_path = self._full_path(path)
         if self.current_file is not None and not filecmp.cmp(full_path, self.current_file):
             print '** Files were not equal **'
+            self._create_new_version(self.current_file)
 
-        # TODO delete tmp file!!!!!!!!!!!!!!!!!!!!
-        self.current_file = None;
+        # Delete the tmp file if it exists
+        if self.current_file is not None:
+            os.remove(self.current_file)
+            self.current_file = None;
+            print '** Deleted tmp file **'
+
         return os.close(fh)
 
     def fsync(self, path, fdatasync, fh):
