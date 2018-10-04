@@ -45,18 +45,29 @@ class VersionFS(LoggingMixIn, Operations):
         basename = os.path.basename(tmp_full_path)
         print '** Creating new version for', basename, '**'
         split = basename.split('.')
-        search_string = ".versiondir/%s*.%s" % (split[0], '.'.join(split[1:len(split) - 1]))
+
+        # Glob the version files
+        search_string = ".versiondir/.%s*.%s" % (split[0], '.'.join(split[1:len(split)-1]))
         files = glob(search_string)
         files.sort()
 
+        # Ensure list is 5 elements long
+        files[len(files):] = [None] * (5 - len(files))
+        print files
+
         # Shimmy the versions
-        for i, f in reversed(list(enumerate(files[0:4]))):
-            files[i + 1] = f
+        for i, f in reversed(list(enumerate(files))):
+            print i, f
+            if f is not None:
+                if i == 4:
+                    os.remove(f)
+                else:
+                    rename_to = '.versiondir/.%s%d.%s' % (split[0], i + 2, '.'.join(split[1:len(split) - 1]))
+                    os.rename(f, rename_to)
 
-        # TODO set first files to be latest version
-        #files[0] =
-
-        # TODO save all files from array
+        # Save tmp as 2nd newest version
+        rename_to = '.versiondir/.%s%d.%s' %(split[0], 1, '.'.join(split[1:len(split) - 1]))
+        os.rename(tmp_full_path, rename_to);
 
     # Filesystem methods
     # ==================
@@ -189,6 +200,7 @@ class VersionFS(LoggingMixIn, Operations):
         if self.current_file is not None and not filecmp.cmp(full_path, self.current_file):
             print '** Files were not equal **'
             self._create_new_version(self.current_file)
+            self.current_file = None
 
         # Delete the tmp file if it exists
         if self.current_file is not None:
@@ -207,5 +219,5 @@ def main(mountpoint):
     FUSE(VersionFS(), mountpoint, nothreads=True, foreground=True)
 
 if __name__ == '__main__':
-    # logging.basicConfig(level=logging.DEBUG)
+    #logging.basicConfig(level=logging.DEBUG)
     main(sys.argv[1])
