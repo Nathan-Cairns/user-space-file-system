@@ -45,13 +45,18 @@ class VersionFS(LoggingMixIn, Operations):
         basename = os.path.basename(tmp_full_path)
         print '** Creating new version for', basename, '**'
         split = basename.split('.')
-        split = split[:len(split) - 1]
-        print split
-        search_string = "%s*%s" % split[0], split
-        print search_string
+        search_string = ".versiondir/%s*.%s" % (split[0], '.'.join(split[1:len(split) - 1]))
         files = glob(search_string)
-        print files
+        files.sort()
 
+        # Shimmy the versions
+        for i, f in reversed(list(enumerate(files[0:4]))):
+            files[i + 1] = f
+
+        # TODO set first files to be latest version
+        #files[0] =
+
+        # TODO save all files from array
 
     # Filesystem methods
     # ==================
