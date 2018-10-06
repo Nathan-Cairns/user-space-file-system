@@ -41,32 +41,35 @@ class VersionFS(LoggingMixIn, Operations):
         copyfile(full_path, self.current_file)
 
     def _create_new_version(self, tmp_full_path):
+        # Make sure .versions dir exists
+        versions_path = os.path.join(self.root, '.versions')
+        if not os.path.exists(versions_path):
+            os.mkdir(versions_path)
+
         # Get relevant path data
         basename = os.path.basename(tmp_full_path)
-        print '** Creating new version for', basename, '**'
+        print '** Creating new version **'
         split = basename.split('.')
 
         # Glob the version files
-        search_string = ".versiondir/.%s*.%s" % (split[0], '.'.join(split[1:len(split)-1]))
+        search_string = ".versiondir/.versions/%s*.%s" % (split[0], '.'.join(split[1:len(split)-1]))
         files = glob(search_string)
         files.sort()
 
         # Ensure list is 5 elements long
         files[len(files):] = [None] * (5 - len(files))
-        print files
 
         # Shimmy the versions
         for i, f in reversed(list(enumerate(files))):
-            print i, f
             if f is not None:
                 if i == 4:
                     os.remove(f)
                 else:
-                    rename_to = '.versiondir/.%s%d.%s' % (split[0], i + 2, '.'.join(split[1:len(split) - 1]))
+                    rename_to = '.versiondir/.versions/%s%d.%s' % (split[0], i + 2, '.'.join(split[1:len(split) - 1]))
                     os.rename(f, rename_to)
 
         # Save tmp as 2nd newest version
-        rename_to = '.versiondir/.%s%d.%s' %(split[0], 1, '.'.join(split[1:len(split) - 1]))
+        rename_to = '.versiondir/.versions/%s%d.%s' %(split[0], 1, '.'.join(split[1:len(split) - 1]))
         os.rename(tmp_full_path, rename_to);
 
     # Filesystem methods
@@ -197,7 +200,7 @@ class VersionFS(LoggingMixIn, Operations):
 
         # Compare current file with file being released if they are different do versioning
         full_path = self._full_path(path)
-        if self.current_file is not None and not filecmp.cmp(full_path, self.current_file):
+        if self.current_file is not None and not filecmp.cmp(full_path, self.current_file, False):
             print '** Files were not equal **'
             self._create_new_version(self.current_file)
             self.current_file = None
