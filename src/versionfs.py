@@ -106,7 +106,8 @@ class VersionFS(LoggingMixIn, Operations):
         if os.path.isdir(full_path):
             dirents.extend(os.listdir(full_path))
         for r in dirents:
-            yield r
+            if r != '.versions':
+                yield r
 
     def readlink(self, path):
         # print "readlink:", path
