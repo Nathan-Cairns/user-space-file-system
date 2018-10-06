@@ -13,6 +13,9 @@ from glob import glob
 from fuse import FUSE, FuseOSError, Operations, LoggingMixIn
 
 
+VERSION_STR = ".versiondir/.versions/%s.%s.%s"
+
+
 class VersionFS(LoggingMixIn, Operations):
     def __init__(self):
         # get current working directory as place for versions tree
@@ -37,7 +40,7 @@ class VersionFS(LoggingMixIn, Operations):
     def _create_tmp_file(self, full_path):
         # Create tmp file for checking changes
         self.current_file = "%s%s" % (full_path, ".tmp")
-        print '** Creating tmp file', self.current_file, '**'
+        print '** Creating tmp file **'
         copyfile(full_path, self.current_file)
 
     def _create_new_version(self, tmp_full_path):
@@ -52,7 +55,7 @@ class VersionFS(LoggingMixIn, Operations):
         split = basename.split('.')
 
         # Glob the version files
-        search_string = ".versiondir/.versions/%s.%s.*" % (split[0], '.'.join(split[1:len(split)-1]))
+        search_string = VERSION_STR % (split[0], '.'.join(split[1:len(split)-1]), '*')
         files = glob(search_string)
         files.sort()
 
@@ -65,11 +68,11 @@ class VersionFS(LoggingMixIn, Operations):
                 if i == 4:
                     os.remove(f)
                 else:
-                    rename_to = '.versiondir/.versions/%s.%s.%d' % (split[0], '.'.join(split[1:len(split) - 1]), i + 3)
+                    rename_to = VERSION_STR % (split[0], '.'.join(split[1:len(split) - 1]), i + 3)
                     os.rename(f, rename_to)
 
         # Save tmp as 2nd newest version
-        rename_to = '.versiondir/.versions/%s.%s.%d' %(split[0], '.'.join(split[1:len(split) - 1]), 2)
+        rename_to = VERSION_STR % (split[0], '.'.join(split[1:len(split) - 1]), 2)
         os.rename(tmp_full_path, rename_to);
 
     # Filesystem methods
