@@ -1,0 +1,63 @@
+#!/usr/bin/env python
+
+
+import os
+import sys
+import glob
+
+
+# CONSTANTS #
+
+
+# Required paths
+WORKING_DIR = os.path.join(os.getcwd(), '.versiondir')
+VERSIONS_DIR = os.path.join(WORKING_DIR, '.versions')
+
+
+# FUNCTIONS #
+
+
+def rename_current(file_name):
+    """Returns a file_name with a '.1' appended to it
+    """
+    full_path = os.path.join(WORKING_DIR, file_name)
+    if os.path.isfile(full_path):
+        return '%s.%d' % (full_path, 1)
+
+
+def get_numbered_versions(file_name):
+    """Returns an array of versions of file_name stored in the .versions folder
+    """
+    if os.path.isdir(VERSIONS_DIR):
+        search_string = '%s/%s.*' % (VERSIONS_DIR, file_name)
+        numbered_versions = glob.glob(search_string)
+        numbered_versions.sort()
+        return numbered_versions
+
+
+def list_versions(file_name):
+    """Prints out all the versions of file_name currently stored.
+
+    Nothing will be printed if no files with file_name exist.
+    """
+    # Set the current version to be name.extension.1
+    current_version = rename_current(file_name)
+    if current_version is None:
+        return
+
+    versions = [current_version]
+
+    # Add the rest of the versions to the array
+    numbered_versions = get_numbered_versions(file_name)
+    versions.extend(numbered_versions)
+
+    #print that shit
+    for version in versions:
+        print os.path.basename(version)
+
+
+# MAIN #
+
+
+if __name__ == '__main__':
+    list_versions(sys.argv[1])

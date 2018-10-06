@@ -52,7 +52,7 @@ class VersionFS(LoggingMixIn, Operations):
         split = basename.split('.')
 
         # Glob the version files
-        search_string = ".versiondir/.versions/%s*.%s" % (split[0], '.'.join(split[1:len(split)-1]))
+        search_string = ".versiondir/.versions/%s.%s.*" % (split[0], '.'.join(split[1:len(split)-1]))
         files = glob(search_string)
         files.sort()
 
@@ -65,11 +65,11 @@ class VersionFS(LoggingMixIn, Operations):
                 if i == 4:
                     os.remove(f)
                 else:
-                    rename_to = '.versiondir/.versions/%s%d.%s' % (split[0], i + 2, '.'.join(split[1:len(split) - 1]))
+                    rename_to = '.versiondir/.versions/%s.%s.%d' % (split[0], '.'.join(split[1:len(split) - 1]), i + 3)
                     os.rename(f, rename_to)
 
         # Save tmp as 2nd newest version
-        rename_to = '.versiondir/.versions/%s%d.%s' %(split[0], 1, '.'.join(split[1:len(split) - 1]))
+        rename_to = '.versiondir/.versions/%s.%s.%d' %(split[0], '.'.join(split[1:len(split) - 1]), 2)
         os.rename(tmp_full_path, rename_to);
 
     # Filesystem methods
