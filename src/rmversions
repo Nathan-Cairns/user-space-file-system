@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+if [ $# -gt 0 ]; then
+  f=$(pwd)/.versiondir/.versions/$1
+  if [ -f $f.2 ]; then
+    rm $f.*
+  fi
+else
+  echo "Not enough arguments supplied"
+fi
