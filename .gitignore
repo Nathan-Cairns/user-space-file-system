@@ -1,8 +1,11 @@
 # versiondir
 .versiondir
 mount/
+
+# Submission
 submission/
-sumbmission.*
+submission.*
+*.zip
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
