@@ -1,0 +1,41 @@
+#!/usr/bin/env python
+
+
+# IMPORTS #
+
+
+import sys
+import os
+
+
+# CONSTANTS #
+
+
+# Required paths
+WORKING_DIR = os.path.join(os.getcwd(), '.versiondir')
+VERSIONS_DIR = os.path.join(WORKING_DIR, '.versions')
+
+
+# FUNCTIONS #
+
+
+def cat_version(file_name, versions_num):
+    """Prints the contents of a file line by line
+    """
+    # Get path
+    full_path = ""
+    if versions_num == 1:
+        full_path = os.path.join(WORKING_DIR, file_name)
+    else:
+        full_path = "%s/%s.%s" % (VERSIONS_DIR, file_name, versions_num)
+
+    # Print file contents
+    with open(full_path, 'r') as fin:
+        print fin.read()
+
+
+# MAIN #
+
+
+if __name__ == '__main__':
+    cat_version(sys.argv[1], int(sys.argv[2]))
