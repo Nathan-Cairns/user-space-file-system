@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+
+# Nathan Cairns
+# ncai762
+
 from __future__ import with_statement
 
 import logging
@@ -12,9 +16,7 @@ from glob import glob
 
 from fuse import FUSE, FuseOSError, Operations, LoggingMixIn
 
-
 VERSION_STR = ".versiondir/.versions/%s.%s.%s"
-
 
 class VersionFS(LoggingMixIn, Operations):
     def __init__(self):

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
 
+# Nathan Cairns
+# ncai762
+
 rm -r $(pwd)/.versiondir
 fusermount -u mount

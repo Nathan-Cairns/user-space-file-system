@@ -1,6 +1,8 @@
 # versiondir
 .versiondir
 mount/
+submission/
+sumbmission.*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

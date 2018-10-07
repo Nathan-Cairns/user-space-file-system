@@ -1,5 +1,6 @@
 Softeng370 A3
 Author: Nathan Cairns
+upi: ncai762
 ==========================
 
 PART 1
@@ -102,5 +103,9 @@ QUESTIONS
 
 Q. Discuss the pros and cons of deleting all versions if a file is deleted in the mount directory.
 
-A.
-
+A. A significant con to deleting all versions if the current file is deleted is it cannot be recovered if the user
+changes their mind in the future.
+For the same reasons as above deleting versions makes the user vulnerable to accidently deleting files and not being
+able to recover their files.
+One pro would be space efficiency, keeping versions for a lot of files would quickly become space inefficent, deleting
+versions helps prevent using to much memory.

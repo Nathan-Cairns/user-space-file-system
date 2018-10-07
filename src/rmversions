@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Nathan Cairns
+# ncai762
+
 if [ $# -gt 0 ]; then
   f=$(pwd)/.versiondir/.versions/$1
   if [ -f $f.2 ]; then
