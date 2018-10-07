@@ -26,7 +26,7 @@ class VersionFS(LoggingMixIn, Operations):
         else:
             print 'Creating version directory.'
             os.mkdir(self.root)
-        self.current_file = None;
+        self.current_file = None
 
     # Helpers
     # =======
@@ -73,7 +73,7 @@ class VersionFS(LoggingMixIn, Operations):
 
         # Save tmp as 2nd newest version
         rename_to = VERSION_STR % (split[0], '.'.join(split[1:len(split) - 1]), 2)
-        os.rename(tmp_full_path, rename_to);
+        os.rename(tmp_full_path, rename_to)
 
     # Filesystem methods
     # ==================
@@ -212,7 +212,7 @@ class VersionFS(LoggingMixIn, Operations):
         # Delete the tmp file if it exists
         if self.current_file is not None:
             os.remove(self.current_file)
-            self.current_file = None;
+            self.current_file = None
             print '** Deleted tmp file **'
 
         return os.close(fh)

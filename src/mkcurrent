@@ -1,0 +1,94 @@
+#!/usr/bin/env python
+
+
+# IMPORTS
+
+
+import sys
+import os
+
+from glob import glob
+from shutil import copyfile
+
+
+# CONSTANTS #
+
+
+# Required paths
+WORKING_DIR = os.path.join(os.getcwd(), '.versiondir')
+VERSIONS_DIR = os.path.join(WORKING_DIR, '.versions')
+
+# Used for creating new versions
+VERSION_STR = ".versiondir/.versions/%s.%s.%s"
+
+
+# FUNCTIONS #
+
+
+def create_tmp_file(full_path):
+    """Creates a tmp file for replacing current version
+    Returns the full path to the new tmp file
+    """
+    tmp_file = "%s%s" % (full_path, ".tmp")
+    copyfile(full_path, tmp_file)
+    return tmp_file
+
+
+def create_new_version(tmp_full_path):
+    """Turns the tmp file into an older version.
+    Increments the other versions accordingly
+    """
+    # Make sure .versions dir exists
+    if not os.path.exists(VERSIONS_DIR):
+        os.mkdir(VERSIONS_DIR)
+
+    # Get relevant path data
+    basename = os.path.basename(tmp_full_path)
+    split = basename.split('.')
+
+    # Glob the version files
+    search_string = VERSION_STR % (split[0], '.'.join(split[1:len(split)-1]), '*')
+    files = glob(search_string)
+    files.sort()
+
+    # Ensure list is 5 elements long
+    files[len(files):] = [None] * (5 - len(files))
+
+    # Shimmy the versions
+    for i, f in reversed(list(enumerate(files))):
+        if f is not None:
+            if i == 4:
+                os.remove(f)
+            else:
+                rename_to = VERSION_STR % (split[0], '.'.join(split[1:len(split) - 1]), i + 3)
+                os.rename(f, rename_to)
+
+    # Save tmp as 2nd newest version
+    rename_to = VERSION_STR % (split[0], '.'.join(split[1:len(split) - 1]), 2)
+    os.rename(tmp_full_path, rename_to)
+
+
+def make_current_version(file_name, version_num):
+    new_version_name = '%s.%s' % (file_name, version_num)
+    new_version_path = os.path.join(VERSIONS_DIR, new_version_name)
+
+    old_version_path = os.path.join(WORKING_DIR, file_name)
+
+    if os.path.isfile(new_version_path):
+        # Create tmp file of current
+        tmp_file = create_tmp_file(old_version_path)
+
+        # Write selected version to current
+        copyfile(new_version_path, old_version_path)
+
+        # Create new version from tmp file
+        create_new_version(tmp_file)
+    else:
+        print "Error: there is no version", version_num, 'for file', file_name
+
+
+# MAIN #
+
+
+if __name__ == '__main__':
+    make_current_version(sys.argv[1], sys.argv[2])
