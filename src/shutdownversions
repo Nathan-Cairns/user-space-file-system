@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+rm -r $(pwd)/.versiondir
+fusermount -u mount
